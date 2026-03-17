@@ -2,30 +2,38 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Admin tạo link</title>
   <style>
-    /* CSS giúp căn giữa giao diện và làm đẹp form */
     body {
       font-family: Arial, sans-serif;
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh; /* Chiều cao bằng 100% màn hình để căn giữa dọc */
+      min-height: 100vh;
       margin: 0;
       background-color: #f0f2f5;
+      padding: 15px; /* Thêm padding để không bị sát mép điện thoại */
+      box-sizing: border-box;
     }
     .container {
       background-color: #fff;
-      padding: 30px 40px;
+      padding: 25px 20px;
       border-radius: 10px;
       box-shadow: 0 4px 15px rgba(0,0,0,0.1);
       text-align: center;
       width: 100%;
       max-width: 400px;
+      box-sizing: border-box;
+    }
+    h2 {
+      margin-top: 0;
+      font-size: 22px;
+      color: #333;
     }
     input {
       width: 100%;
-      padding: 10px;
+      padding: 12px; /* Tăng padding để dễ bấm trên cảm ứng */
       font-size: 16px;
       border: 1px solid #ccc;
       border-radius: 5px;
@@ -33,14 +41,16 @@
       margin-bottom: 15px;
     }
     button {
-      padding: 10px 20px;
+      padding: 12px 20px;
       font-size: 16px;
+      font-weight: bold;
       color: #fff;
       background-color: #007bff;
       border: none;
       border-radius: 5px;
       cursor: pointer;
       transition: 0.3s;
+      width: 100%; /* Kéo dài nút ra cho dễ bấm */
     }
     button:hover {
       background-color: #0056b3;
@@ -49,9 +59,10 @@
       margin-top: 20px;
       border-top: 1px solid #eee;
       padding-top: 20px;
+      word-break: break-all; /* Tránh link dài làm vỡ layout */
     }
     .countdown {
-      color: #dc3545; /* Màu đỏ cho thời gian */
+      color: #dc3545;
       font-weight: bold;
       font-size: 16px;
       margin-top: 15px;
@@ -88,7 +99,6 @@ async function createLink() {
   const data = await res.json();
   const fullLink = location.origin + "/download.html?data=" + data.data;
 
-  // Giải mã dữ liệu base64 để lấy thời gian hết hạn (exp)
   const decodedData = JSON.parse(atob(data.data));
   const expTime = decodedData.exp;
 
@@ -97,18 +107,15 @@ async function createLink() {
   resultDiv.innerHTML = `
     <p style="margin: 0 0 10px 0; font-size: 14px; color: #555;">Link tải cho <b>${name}</b>:</p>
     <input value="${fullLink}" id="linkInput" readonly />
-    <button onclick="copyLink()" style="background-color: #28a745; width: 100%;">Copy Link</button>
+    <button onclick="copyLink()" style="background-color: #28a745; margin-bottom: 10px;">Copy Link</button>
     <div id="timeRemaining" class="countdown">Đang tính thời gian...</div>
   `;
 
-  // Gọi hàm đếm ngược thời gian
   startCountdown(expTime);
 }
 
 function startCountdown(expTime) {
-  // Reset bộ đếm nếu admin ấn nút tạo link liên tục
   if (countdownTimer) clearInterval(countdownTimer);
-
   const display = document.getElementById("timeRemaining");
 
   countdownTimer = setInterval(() => {
@@ -122,11 +129,8 @@ function startCountdown(expTime) {
       return;
     }
 
-    // Đổi mili-giây ra số phút và giây
     const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
     const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-    // Định dạng thêm số 0 đằng trước nếu giây < 10 (VD: 14:05)
     const formatSeconds = seconds < 10 ? "0" + seconds : seconds;
 
     display.innerHTML = `Link tự huỷ sau: ${minutes}:${formatSeconds}`;
