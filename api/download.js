@@ -1,25 +1,27 @@
-import { v4 as uuidv4 } from "uuid";
-
-export default function handler(req, res) {
+export default async function handler(req, res) {
   const { data } = req.query;
-
-  if (!data) {
-    return res.status(400).send("Invalid link");
-  }
 
   let decoded;
 
   try {
-    decoded = JSON.parse(
-      Buffer.from(data, "base64").toString()
-    );
+    decoded = JSON.parse(Buffer.from(data, "base64").toString());
   } catch {
-    return res.status(400).send("Corrupted data");
+    return res.status(400).send("Lỗi");
   }
 
   if (Date.now() > decoded.exp) {
-    return res.status(410).send("Link đã hết hạn");
+    return res.status(410).send("Hết hạn");
   }
+
+  const ip = req.headers["x-forwarded-for"];
+  const ua = req.headers["user-agent"];
+
+  if (decoded.ip !== ip || decoded.ua !== ua) {
+    return res.status(403).send("Link bị chia sẻ");
+  }
+
+  // tạo file như cũ
+}
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
