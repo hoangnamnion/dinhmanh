@@ -1,68 +1,91 @@
-<script>
-const params = new URLSearchParams(location.search);
-let data = params.get("data");
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tải cấu hình</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; margin-top: 50px; }
+        button { padding: 10px 20px; font-size: 16px; cursor: pointer; }
+    </style>
+</head>
+<body>
 
-function getFingerprint() {
-  const raw = [
-    navigator.userAgent,
-    navigator.language,
-    screen.width + "x" + screen.height,
-    Intl.DateTimeFormat().resolvedOptions().timeZone,
-    navigator.platform
-  ].join("|");
+    <h2 id="title">Đang kiểm tra thông tin...</h2>
+    <button id="downloadBtn" style="display: none;">Tải Profile Locket</button>
 
-  return btoa(raw);
-}
+    <script>
+    const params = new URLSearchParams(location.search);
+    let data = params.get("data");
 
-async function init() {
-  let decoded = JSON.parse(atob(data));
+    function getFingerprint() {
+      const raw = [
+        navigator.userAgent,
+        navigator.language,
+        screen.width + "x" + screen.height,
+        Intl.DateTimeFormat().resolvedOptions().timeZone,
+        navigator.platform
+      ].join("|");
 
-  if (Date.now() > decoded.exp) {
-    return show("Link hết hạn");
-  }
-
-  const fp = getFingerprint();
-
-  // nếu chưa có danh sách thiết bị
-  if (!decoded.devices) {
-    decoded.devices = [fp];
-    data = btoa(JSON.stringify(decoded));
-  } else {
-    // nếu thiết bị chưa có trong list
-    if (!decoded.devices.includes(fp)) {
-      if (decoded.devices.length >= 2) {
-        return show("Link chỉ dùng tối đa 2 thiết bị ❌");
-      }
-
-      decoded.devices.push(fp);
-      data = btoa(JSON.stringify(decoded));
+      return btoa(raw);
     }
-  }
 
-  show("Cấu hình cho: " + decoded.name, true);
-}
+    async function init() {
+      // Thêm try-catch để tránh lỗi nếu 'data' trống hoặc sai định dạng
+      if (!data) return show("Link không hợp lệ");
+      
+      try {
+          let decoded = JSON.parse(atob(data));
 
-function show(text, showBtn = false) {
-  document.getElementById("title").innerText = text;
+          if (Date.now() > decoded.exp) {
+            return show("Link hết hạn");
+          }
 
-  const btn = document.getElementById("downloadBtn");
-  if (showBtn) {
-    btn.style.display = "inline-block";
+          const fp = getFingerprint();
 
-    btn.onclick = () => {
-      fetch("/api/download?data=" + data, {
-        headers: {
-          "x-fp": getFingerprint()
-        }
-      })
-      .then(res => res.blob())
-      .then(blob => {
-        const url = URL.createObjectURL(blob);
-        window.location.href = url;
-      });
-    };
-  }
-}
+          if (!decoded.devices) {
+            decoded.devices = [fp];
+            data = btoa(JSON.stringify(decoded));
+          } else {
+            if (!decoded.devices.includes(fp)) {
+              if (decoded.devices.length >= 2) {
+                return show("Link chỉ dùng tối đa 2 thiết bị ❌");
+              }
 
-init();
-</script>
+              decoded.devices.push(fp);
+              data = btoa(JSON.stringify(decoded));
+            }
+          }
+
+          show("Cấu hình cho: " + decoded.name, true);
+      } catch (e) {
+          show("Dữ liệu không hợp lệ");
+      }
+    }
+
+    function show(text, showBtn = false) {
+      document.getElementById("title").innerText = text;
+
+      const btn = document.getElementById("downloadBtn");
+      if (showBtn) {
+        btn.style.display = "inline-block";
+
+        btn.onclick = () => {
+          fetch("/api/download?data=" + data, {
+            headers: {
+              "x-fp": getFingerprint()
+            }
+          })
+          .then(res => res.blob())
+          .then(blob => {
+            const url = URL.createObjectURL(blob);
+            window.location.href = url;
+          });
+        };
+      }
+    }
+
+    init();
+    </script>
+</body>
+</html>
