@@ -3,20 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tải cấu hình</title>
+    <title>Tải cấu hình Locket</title>
     <style>
-        body { font-family: sans-serif; text-align: center; margin-top: 50px; }
-        button { padding: 10px 20px; font-size: 16px; cursor: pointer; }
+        body { 
+            font-family: Arial, sans-serif; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            margin: 0; 
+            background-color: #f0f2f5; 
+        }
+        .container { 
+            background: #fff; 
+            padding: 30px 40px; 
+            border-radius: 10px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+            text-align: center; 
+            width: 100%; 
+            max-width: 350px; 
+        }
+        h2 { margin-top: 0; color: #333; font-size: 22px; }
+        button { 
+            padding: 12px 20px; 
+            font-size: 16px; 
+            font-weight: bold;
+            cursor: pointer; 
+            background-color: #007bff; 
+            color: white; 
+            border: none; 
+            border-radius: 5px; 
+            width: 100%;
+            transition: 0.3s;
+        }
+        button:hover { background-color: #0056b3; }
+        #countdown { 
+            color: #dc3545; 
+            font-size: 18px; 
+            font-weight: bold; 
+            margin: 15px 0; 
+        }
     </style>
 </head>
 <body>
 
-    <h2 id="title">Đang kiểm tra thông tin...</h2>
-    <button id="downloadBtn" style="display: none;">Tải Profile Locket</button>
+    <div class="container">
+        <h2 id="title">Đang kiểm tra...</h2>
+        <div id="countdown"></div>
+        <button id="downloadBtn" style="display: none;">Tải Profile Locket</button>
+    </div>
 
     <script>
     const params = new URLSearchParams(location.search);
     let data = params.get("data");
+    let timerInterval;
 
     function getFingerprint() {
       const raw = [
@@ -31,14 +71,13 @@
     }
 
     async function init() {
-      // Thêm try-catch để tránh lỗi nếu 'data' trống hoặc sai định dạng
-      if (!data) return show("Link không hợp lệ");
+      if (!data) return show("Link không hợp lệ ❌");
       
       try {
           let decoded = JSON.parse(atob(data));
 
           if (Date.now() > decoded.exp) {
-            return show("Link hết hạn");
+            return show("Link đã hết hạn ❌");
           }
 
           const fp = getFingerprint();
@@ -51,15 +90,19 @@
               if (decoded.devices.length >= 2) {
                 return show("Link chỉ dùng tối đa 2 thiết bị ❌");
               }
-
               decoded.devices.push(fp);
               data = btoa(JSON.stringify(decoded));
             }
           }
 
+          // Hiển thị tên User
           show("Cấu hình cho: " + decoded.name, true);
+          
+          // Bắt đầu đếm ngược thời gian cho khách hàng
+          startCountdown(decoded.exp);
+
       } catch (e) {
-          show("Dữ liệu không hợp lệ");
+          show("Dữ liệu không hợp lệ ❌");
       }
     }
 
@@ -76,13 +119,43 @@
               "x-fp": getFingerprint()
             }
           })
-          .then(res => res.blob())
+          .then(res => {
+              if(!res.ok) throw new Error("Lỗi tải file");
+              return res.blob();
+          })
           .then(blob => {
             const url = URL.createObjectURL(blob);
             window.location.href = url;
-          });
+          })
+          .catch(err => alert("Có lỗi xảy ra hoặc link đã quá hạn."));
         };
+      } else {
+          // Ẩn nút và bộ đếm nếu có lỗi hoặc hết hạn
+          btn.style.display = "none";
+          document.getElementById("countdown").innerHTML = "";
+          if(timerInterval) clearInterval(timerInterval);
       }
+    }
+
+    function startCountdown(expTime) {
+      const display = document.getElementById("countdown");
+      
+      timerInterval = setInterval(() => {
+        const now = Date.now();
+        const distance = expTime - now;
+
+        if (distance <= 0) {
+          clearInterval(timerInterval);
+          show("Link đã hết hạn ❌");
+          return;
+        }
+
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+        const formatSeconds = seconds < 10 ? "0" + seconds : seconds;
+
+        display.innerHTML = `Hết hạn sau: ${minutes}:${formatSeconds}`;
+      }, 1000);
     }
 
     init();
