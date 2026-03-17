@@ -2,163 +2,529 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tải cấu hình Locket</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Locket Gold · TNOAA</title>
+    <!-- Font chữ cao cấp cho mobile -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
     <style>
-        body { 
-            font-family: Arial, sans-serif; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            height: 100vh; 
-            margin: 0; 
-            background-color: #f0f2f5; 
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        .container { 
-            background: #fff; 
-            padding: 30px 40px; 
-            border-radius: 10px; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
-            text-align: center; 
-            width: 100%; 
-            max-width: 350px; 
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f8fafd;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
         }
-        h2 { margin-top: 0; color: #333; font-size: 22px; }
-        button { 
-            padding: 12px 20px; 
-            font-size: 16px; 
-            font-weight: bold;
-            cursor: pointer; 
-            background-color: #007bff; 
-            color: white; 
-            border: none; 
-            border-radius: 5px; 
+
+        /* Background trắng tinh tế với hiệu ứng nhẹ */
+        .light-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(145deg, #ffffff 0%, #f5f9ff 100%);
+            z-index: -2;
+        }
+
+        .light-bg::before {
+            content: '';
+            position: absolute;
+            top: -20%;
+            right: -10%;
+            width: 60%;
+            height: 60%;
+            background: radial-gradient(circle, rgba(255,215,0,0.08) 0%, transparent 70%);
+            border-radius: 50%;
+            filter: blur(50px);
+        }
+
+        .light-bg::after {
+            content: '';
+            position: absolute;
+            bottom: -20%;
+            left: -10%;
+            width: 60%;
+            height: 60%;
+            background: radial-gradient(circle, rgba(0,150,255,0.05) 0%, transparent 70%);
+            border-radius: 50%;
+            filter: blur(60px);
+        }
+
+        .container {
             width: 100%;
-            transition: 0.3s;
+            max-width: 400px;
+            padding: 16px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 10;
         }
-        button:hover { background-color: #0056b3; }
-        #countdown { 
-            color: #dc3545; 
-            font-size: 18px; 
-            font-weight: bold; 
-            margin: 15px 0; 
+
+        /* Card chính - trắng sáng, bóng đổ nhẹ */
+        .card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 40px;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            box-shadow: 0 20px 40px -12px rgba(0, 20, 40, 0.15), 0 0 0 1px rgba(255,215,0,0.2) inset;
+            overflow: hidden;
+            padding: 28px 22px 32px;
+        }
+
+        /* Header với badge - phong cách trong suốt trên nền trắng */
+        .badge-collection {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 24px;
+            justify-content: center;
+        }
+
+        .badge {
+            padding: 8px 18px;
+            border-radius: 40px;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            background: white;
+            border: 1px solid rgba(0,0,0,0.05);
+            color: #1e2b3c;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+        }
+
+        .badge.gold {
+            background: linear-gradient(145deg, #f8e3a0, #f5d87a);
+            border-color: #e9c44c;
+            color: #6b4f0b;
+            font-weight: 700;
+        }
+
+        .badge.tech {
+            background: #eef5ff;
+            border-color: #c0d4f0;
+            color: #2a4b7c;
+        }
+
+        /* Avatar khu vực tên */
+        .profile-area {
+            text-align: center;
+            margin-bottom: 24px;
+            position: relative;
+        }
+
+        .gold-circle {
+            width: 88px;
+            height: 88px;
+            background: linear-gradient(145deg, #fbe69b, #f3cd60);
+            border-radius: 50%;
+            margin: 0 auto 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 20px -5px rgba(180, 130, 20, 0.2);
+            position: relative;
+            border: 2px solid white;
+        }
+
+        .gold-circle::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 2px solid rgba(255,215,0,0.4);
+            top: -4px;
+            left: -4px;
+            right: -4px;
+            bottom: -4px;
+            border-color: #f3cd60 transparent #f3cd60 transparent;
+            border-width: 2px;
+            border-style: solid;
+            border-radius: 50%;
+            animation: rotate 6s linear infinite;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .gold-circle span {
+            font-size: 36px;
+            font-weight: 600;
+            color: #5f4a0e;
+        }
+
+        #title {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1a2634;
+            margin-bottom: 4px;
+            letter-spacing: -0.5px;
+        }
+
+        .sub-title {
+            color: #7b8a9f;
+            font-size: 15px;
+            font-weight: 400;
+            margin-bottom: 20px;
+        }
+
+        /* Timer countdown - nền trắng, viền gold */
+        .time-section {
+            background: white;
+            border-radius: 32px;
+            padding: 20px 16px;
+            margin: 20px 0 24px;
+            border: 1px solid rgba(218, 165, 32, 0.2);
+            box-shadow: 0 8px 18px -8px rgba(0,0,0,0.05);
+        }
+
+        .timer-label {
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #b8860b;
+            margin-bottom: 8px;
+        }
+
+        #countdown {
+            font-size: 56px;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+            color: #1e2b3c;
+            line-height: 1;
+            margin: 8px 0;
+        }
+
+        .timer-note {
+            color: #94a3b8;
+            font-size: 13px;
+            margin-top: 8px;
+        }
+
+        /* Nút tải - vàng gold trên nền trắng */
+        .download-btn {
+            background: linear-gradient(145deg, #d4af37, #c09a2b);
+            border: none;
+            padding: 20px 24px;
+            width: 100%;
+            border-radius: 60px;
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 15px 25px -8px rgba(180, 130, 20, 0.3);
+            margin: 24px 0 16px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            border: 1px solid rgba(255,255,255,0.3);
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .download-btn:active {
+            transform: scale(0.97);
+            box-shadow: 0 8px 15px -5px rgba(150, 100, 10, 0.4);
+        }
+
+        .download-btn:disabled {
+            opacity: 0.6;
+            transform: none;
+        }
+
+        .btn-icon {
+            font-size: 22px;
+        }
+
+        /* Device fingerprint - nhẹ nhàng */
+        .device-info {
+            background: #f0f4fa;
+            border-radius: 60px;
+            padding: 10px 16px;
+            margin-top: 16px;
+            border: 1px solid rgba(0,0,0,0.02);
+            font-size: 13px;
+            color: #4a5b73;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            background: #34c759;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .footer {
+            margin-top: 24px;
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            color: #9aa9bc;
+            font-size: 13px;
+            font-weight: 400;
+        }
+
+        /* Trạng thái lỗi */
+        .error-box {
+            background: #fff2f0;
+            border: 1px solid #ffcdc7;
+            border-radius: 32px;
+            padding: 28px 20px;
+            text-align: center;
+            color: #b13e4b;
+            font-weight: 500;
+            margin: 20px 0;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .emoji-large {
+            font-size: 48px;
+            margin-bottom: 12px;
+            display: block;
         }
     </style>
 </head>
 <body>
-
+    <div class="light-bg"></div>
     <div class="container">
-        <h2 id="title">Đang kiểm tra...</h2>
-        <div id="countdown"></div>
-        <button id="downloadBtn" style="display: none;">Tải Profile Locket</button>
+        <div class="card">
+            <!-- Badge thông tin nổi bật trên nền trắng -->
+            <div class="badge-collection">
+                <span class="badge gold">✨ Locket Gold</span>
+                <span class="badge tech">⚡ Hyper Tech</span>
+                <span class="badge">TNOAA-Đình Mạnh</span>
+                <span class="badge gold">15s</span>
+            </div>
+
+            <!-- Profile -->
+            <div class="profile-area">
+                <div class="gold-circle">
+                    <span>⏣</span>
+                </div>
+                <h2 id="title">Đang xác thực</h2>
+                <div class="sub-title" id="subTitle">Vui lòng chờ giây lát</div>
+            </div>
+
+            <!-- Countdown Container (ẩn mặc định) -->
+            <div id="countdownContainer" class="time-section hidden">
+                <div class="timer-label">⏳ HIỆU LỰC CÒN LẠI</div>
+                <div id="countdown">00:00</div>
+                <div class="timer-note">Liên kết sẽ hết hạn sau thời gian trên</div>
+            </div>
+
+            <!-- Nút tải (ẩn mặc định) -->
+            <button id="downloadBtn" class="download-btn hidden">
+                <span class="btn-icon">⬇️</span>
+                <span>Tải cấu hình Locket</span>
+            </button>
+
+            <!-- Thông báo lỗi thay thế -->
+            <div id="errorContainer" class="error-box hidden">
+                <span class="emoji-large">🔒</span>
+                <div id="errorMessage">Liên kết không hợp lệ</div>
+            </div>
+
+            <!-- Fingerprint hiển thị nhẹ nhàng -->
+            <div id="fpDisplay" class="device-info hidden">
+                <span class="dot"></span>
+                <span id="fpText"></span>
+            </div>
+
+            <!-- Footer -->
+            <div class="footer">
+                <span>🔐 2 thiết bị tối đa</span>
+                <span>✦</span>
+                <span>⚡ Bảo mật Gold</span>
+            </div>
+        </div>
     </div>
 
     <script>
-    const params = new URLSearchParams(location.search);
-    let data = params.get("data");
-    let timerInterval;
+        (function() {
+            const params = new URLSearchParams(location.search);
+            let data = params.get("data");
+            let timerInterval;
 
-    function getFingerprint() {
-      const raw = [
-        navigator.userAgent,
-        navigator.language,
-        screen.width + "x" + screen.height,
-        Intl.DateTimeFormat().resolvedOptions().timeZone,
-        navigator.platform
-      ].join("|");
-
-      return btoa(raw);
-    }
-
-    async function init() {
-      if (!data) return show("Link không hợp lệ ❌");
-      
-      try {
-          let decoded = JSON.parse(atob(data));
-
-          if (Date.now() > decoded.exp) {
-            return show("Link đã hết hạn ❌");
-          }
-
-          const fp = getFingerprint();
-
-          if (!decoded.devices) {
-            decoded.devices = [fp];
-            data = btoa(JSON.stringify(decoded));
-          } else {
-            if (!decoded.devices.includes(fp)) {
-              if (decoded.devices.length >= 2) {
-                return show("Link chỉ dùng tối đa 2 thiết bị ❌");
-              }
-              decoded.devices.push(fp);
-              data = btoa(JSON.stringify(decoded));
+            // Lấy fingerprint chuẩn cho so sánh (base64)
+            function getRawFingerprint() {
+                const raw = [
+                    navigator.userAgent,
+                    navigator.language,
+                    screen.width + "x" + screen.height,
+                    Intl.DateTimeFormat().resolvedOptions().timeZone,
+                    navigator.platform || 'unknown',
+                    new Date().getTimezoneOffset()
+                ].join('|');
+                try {
+                    return btoa(unescape(encodeURIComponent(raw)));
+                } catch (e) {
+                    return 'fp_' + Math.random().toString(36);
+                }
             }
-          }
 
-          // Hiển thị tên User
-          show("Cấu hình cho: " + decoded.name, true);
-          
-          // Bắt đầu đếm ngược thời gian cho khách hàng
-          startCountdown(decoded.exp);
-
-      } catch (e) {
-          show("Dữ liệu không hợp lệ ❌");
-      }
-    }
-
-    function show(text, showBtn = false) {
-      document.getElementById("title").innerText = text;
-
-      const btn = document.getElementById("downloadBtn");
-      if (showBtn) {
-        btn.style.display = "inline-block";
-
-        btn.onclick = () => {
-          fetch("/api/download?data=" + data, {
-            headers: {
-              "x-fp": getFingerprint()
+            // Lấy fingerprint rút gọn để hiển thị
+            function getDisplayFingerprint() {
+                const raw = getRawFingerprint();
+                return raw.substring(0, 16) + '..';
             }
-          })
-          .then(res => {
-              if(!res.ok) throw new Error("Lỗi tải file");
-              return res.blob();
-          })
-          .then(blob => {
-            const url = URL.createObjectURL(blob);
-            window.location.href = url;
-          })
-          .catch(err => alert("Có lỗi xảy ra hoặc link đã quá hạn."));
-        };
-      } else {
-          // Ẩn nút và bộ đếm nếu có lỗi hoặc hết hạn
-          btn.style.display = "none";
-          document.getElementById("countdown").innerHTML = "";
-          if(timerInterval) clearInterval(timerInterval);
-      }
-    }
 
-    function startCountdown(expTime) {
-      const display = document.getElementById("countdown");
-      
-      timerInterval = setInterval(() => {
-        const now = Date.now();
-        const distance = expTime - now;
+            function hideAll() {
+                document.getElementById('countdownContainer').classList.add('hidden');
+                document.getElementById('downloadBtn').classList.add('hidden');
+                document.getElementById('errorContainer').classList.add('hidden');
+                document.getElementById('fpDisplay').classList.add('hidden');
+            }
 
-        if (distance <= 0) {
-          clearInterval(timerInterval);
-          show("Link đã hết hạn ❌");
-          return;
-        }
+            function showError(msg) {
+                hideAll();
+                document.getElementById('errorContainer').classList.remove('hidden');
+                document.getElementById('errorMessage').innerText = msg;
+                document.getElementById('title').innerText = 'Không thể truy cập';
+                document.getElementById('subTitle').innerText = 'Vui lòng kiểm tra lại';
+                if (timerInterval) clearInterval(timerInterval);
+            }
 
-        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-        const formatSeconds = seconds < 10 ? "0" + seconds : seconds;
+            function showValid(userName, expTime) {
+                hideAll();
+                document.getElementById('title').innerText = userName || 'Locket User';
+                document.getElementById('subTitle').innerHTML = '✅ Sẵn sàng tải cấu hình';
+                
+                document.getElementById('countdownContainer').classList.remove('hidden');
+                document.getElementById('downloadBtn').classList.remove('hidden');
+                document.getElementById('fpDisplay').classList.remove('hidden');
 
-        display.innerHTML = `Hết hạn sau: ${minutes}:${formatSeconds}`;
-      }, 1000);
-    }
+                // Fingerprint hiển thị
+                const fp = getDisplayFingerprint();
+                document.getElementById('fpText').innerText = `Thiết bị: ${fp}`;
 
-    init();
+                // Đếm ngược
+                startCountdown(expTime);
+
+                // Nút tải
+                document.getElementById('downloadBtn').onclick = function(e) {
+                    e.preventDefault();
+                    const btn = this;
+                    btn.disabled = true;
+                    btn.innerHTML = '<span class="btn-icon">⏳</span><span>Đang xử lý...</span>';
+
+                    fetch("/api/download?data=" + data, {
+                        headers: { "x-fp": getRawFingerprint() }
+                    })
+                    .then(res => {
+                        if (!res.ok) throw new Error('Lỗi tải file');
+                        return res.blob();
+                    })
+                    .then(blob => {
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = 'locket_gold_15s.mobileconfig';
+                        document.body.appendChild(a);
+                        a.click();
+                        setTimeout(() => {
+                            document.body.removeChild(a);
+                            URL.revokeObjectURL(url);
+                        }, 200);
+                        btn.disabled = false;
+                        btn.innerHTML = '<span class="btn-icon">⬇️</span><span>Tải cấu hình Locket</span>';
+                    })
+                    .catch(err => {
+                        alert('Không thể tải: ' + err.message);
+                        btn.disabled = false;
+                        btn.innerHTML = '<span class="btn-icon">⬇️</span><span>Tải cấu hình Locket</span>';
+                    });
+                };
+            }
+
+            function startCountdown(expTime) {
+                const display = document.getElementById('countdown');
+                if (timerInterval) clearInterval(timerInterval);
+                
+                timerInterval = setInterval(() => {
+                    const now = Date.now();
+                    const dist = expTime - now;
+
+                    if (dist <= 0) {
+                        clearInterval(timerInterval);
+                        showError('Liên kết đã hết hạn');
+                        return;
+                    }
+
+                    const mins = Math.floor((dist % (1000*60*60)) / (1000*60));
+                    const secs = Math.floor((dist % (1000*60)) / 1000);
+                    display.innerText = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+                }, 500);
+            }
+
+            // Khởi tạo kiểm tra data
+            function init() {
+                if (!data) {
+                    showError('Link không hợp lệ');
+                    return;
+                }
+
+                try {
+                    let decoded = JSON.parse(atob(data));
+
+                    if (Date.now() > decoded.exp) {
+                        showError('Link đã hết hạn');
+                        return;
+                    }
+
+                    const rawFP = getRawFingerprint();
+
+                    if (!decoded.devices) {
+                        decoded.devices = [rawFP];
+                        data = btoa(JSON.stringify(decoded));
+                    } else {
+                        if (!decoded.devices.includes(rawFP)) {
+                            if (decoded.devices.length >= 2) {
+                                showError('Link đã dùng trên 2 thiết bị');
+                                return;
+                            }
+                            decoded.devices.push(rawFP);
+                            data = btoa(JSON.stringify(decoded));
+                        }
+                    }
+
+                    showValid(decoded.name || 'Locket User', decoded.exp);
+
+                } catch (e) {
+                    console.warn(e);
+                    showError('Dữ liệu không hợp lệ');
+                }
+            }
+
+            init();
+        })();
     </script>
 </body>
 </html>
