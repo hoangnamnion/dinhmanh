@@ -1,4 +1,4 @@
-export default async function handler(req, res) {
+export default function handler(req, res) {
   const { data } = req.query;
 
   let decoded;
@@ -13,15 +13,13 @@ export default async function handler(req, res) {
     return res.status(410).send("Hết hạn");
   }
 
-  const ip = req.headers["x-forwarded-for"];
-  const ua = req.headers["user-agent"];
+  const clientFp = req.headers["x-fp"];
 
-  if (decoded.ip !== ip || decoded.ua !== ua) {
-    return res.status(403).send("Link bị chia sẻ");
+  if (!decoded.devices || !decoded.devices.includes(clientFp)) {
+    return res.status(403).send("Thiết bị không hợp lệ");
   }
 
-  // tạo file như cũ
-}
+
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
