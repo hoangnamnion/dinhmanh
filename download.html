@@ -2,6 +2,18 @@
 const params = new URLSearchParams(location.search);
 let data = params.get("data");
 
+function getFingerprint() {
+  const raw = [
+    navigator.userAgent,
+    navigator.language,
+    screen.width + "x" + screen.height,
+    Intl.DateTimeFormat().resolvedOptions().timeZone,
+    navigator.platform
+  ].join("|");
+
+  return btoa(raw);
+}
+
 async function init() {
   let decoded = JSON.parse(atob(data));
 
@@ -9,22 +21,21 @@ async function init() {
     return show("Link hết hạn");
   }
 
-  // lấy IP từ API free
-  const ipRes = await fetch("https://api.ipify.org?format=json");
-  const ipData = await ipRes.json();
+  const fp = getFingerprint();
 
-  const ua = navigator.userAgent;
-
-  // nếu chưa có IP → khóa link
-  if (!decoded.ip) {
-    decoded.ip = ipData.ip;
-    decoded.ua = ua;
-
+  // nếu chưa có danh sách thiết bị
+  if (!decoded.devices) {
+    decoded.devices = [fp];
     data = btoa(JSON.stringify(decoded));
   } else {
-    // check mismatch
-    if (decoded.ip !== ipData.ip || decoded.ua !== ua) {
-      return show("Link đã bị chia sẻ ❌");
+    // nếu thiết bị chưa có trong list
+    if (!decoded.devices.includes(fp)) {
+      if (decoded.devices.length >= 2) {
+        return show("Link chỉ dùng tối đa 2 thiết bị ❌");
+      }
+
+      decoded.devices.push(fp);
+      data = btoa(JSON.stringify(decoded));
     }
   }
 
@@ -33,12 +44,22 @@ async function init() {
 
 function show(text, showBtn = false) {
   document.getElementById("title").innerText = text;
-  const btn = document.getElementById("downloadBtn");
 
+  const btn = document.getElementById("downloadBtn");
   if (showBtn) {
     btn.style.display = "inline-block";
+
     btn.onclick = () => {
-      location.href = "/api/download?data=" + data;
+      fetch("/api/download?data=" + data, {
+        headers: {
+          "x-fp": getFingerprint()
+        }
+      })
+      .then(res => res.blob())
+      .then(blob => {
+        const url = URL.createObjectURL(blob);
+        window.location.href = url;
+      });
     };
   }
 }
