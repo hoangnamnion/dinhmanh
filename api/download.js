@@ -1,3 +1,5 @@
+import { v4 as uuidv4 } from 'uuid'; // THÊM DÒNG NÀY VÀO TRÊN CÙNG
+
 export default function handler(req, res) {
   const { data } = req.query;
 
@@ -18,8 +20,6 @@ export default function handler(req, res) {
   if (!decoded.devices || !decoded.devices.includes(clientFp)) {
     return res.status(403).send("Thiết bị không hợp lệ");
   }
-
-
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
