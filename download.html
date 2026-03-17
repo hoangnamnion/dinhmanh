@@ -1,0 +1,47 @@
+<script>
+const params = new URLSearchParams(location.search);
+let data = params.get("data");
+
+async function init() {
+  let decoded = JSON.parse(atob(data));
+
+  if (Date.now() > decoded.exp) {
+    return show("Link hết hạn");
+  }
+
+  // lấy IP từ API free
+  const ipRes = await fetch("https://api.ipify.org?format=json");
+  const ipData = await ipRes.json();
+
+  const ua = navigator.userAgent;
+
+  // nếu chưa có IP → khóa link
+  if (!decoded.ip) {
+    decoded.ip = ipData.ip;
+    decoded.ua = ua;
+
+    data = btoa(JSON.stringify(decoded));
+  } else {
+    // check mismatch
+    if (decoded.ip !== ipData.ip || decoded.ua !== ua) {
+      return show("Link đã bị chia sẻ ❌");
+    }
+  }
+
+  show("Cấu hình cho: " + decoded.name, true);
+}
+
+function show(text, showBtn = false) {
+  document.getElementById("title").innerText = text;
+  const btn = document.getElementById("downloadBtn");
+
+  if (showBtn) {
+    btn.style.display = "inline-block";
+    btn.onclick = () => {
+      location.href = "/api/download?data=" + data;
+    };
+  }
+}
+
+init();
+</script>
