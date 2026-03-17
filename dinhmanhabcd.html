@@ -1,16 +1,16 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Tạo link mobileconfig</title>
+  <title>Admin tạo link</title>
 </head>
 <body>
 
-<h2>Tạo link cấu hình</h2>
+<h2>Tạo link mobileconfig</h2>
 
 <input id="name" placeholder="Nhập tên user" />
 <button onclick="createLink()">Tạo link</button>
 
-<p id="result"></p>
+<div id="result" style="margin-top:20px;"></div>
 
 <script>
 async function createLink() {
@@ -18,14 +18,26 @@ async function createLink() {
 
   const res = await fetch("/api/create", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {"Content-Type": "application/json"},
     body: JSON.stringify({ name })
   });
 
   const data = await res.json();
 
-  document.getElementById("result").innerText =
-    location.origin + data.link;
+  const fullLink = location.origin + "/download.html?data=" + data.data;
+
+  document.getElementById("result").innerHTML = `
+    <p>Link:</p>
+    <input value="${fullLink}" id="linkInput" style="width:300px" readonly />
+    <button onclick="copyLink()">Copy</button>
+  `;
+}
+
+function copyLink() {
+  const input = document.getElementById("linkInput");
+  input.select();
+  document.execCommand("copy");
+  alert("Đã copy link!");
 }
 </script>
 
