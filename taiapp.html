@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Admin tạo link</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      background-color: #f0f2f5;
+      padding: 15px;
+      box-sizing: border-box;
+    }
+    .container, .history-container {
+      background-color: #fff;
+      padding: 25px 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      text-align: center;
+      width: 100%;
+      max-width: 450px;
+      box-sizing: border-box;
+      margin-bottom: 20px;
+    }
+    h2 { margin-top: 0; font-size: 22px; color: #333; }
+    input {
+      width: 100%; padding: 12px; font-size: 16px; border: 1px solid #ccc;
+      border-radius: 5px; box-sizing: border-box; margin-bottom: 15px;
+    }
+    button {
+      padding: 12px 20px; font-size: 16px; font-weight: bold; color: #fff;
+      background-color: #007bff; border: none; border-radius: 5px; cursor: pointer;
+      transition: 0.3s; width: 100%;
+    }
+    button:hover { background-color: #0056b3; }
+    
+    #result { margin-top: 20px; border-top: 1px solid #eee; padding-top: 20px; word-break: break-all; }
+    .countdown { color: #dc3545; font-weight: bold; font-size: 16px; margin-top: 15px; }
+
+    /* CSS cho phần lịch sử */
+    .history-container { text-align: left; }
+    .history-item {
+      background: #f9f9f9; padding: 10px; border-radius: 5px; margin-bottom: 10px;
+      border-left: 4px solid #007bff; display: flex; flex-direction: column; gap: 5px;
+    }
+    .history-item.expired { border-left-color: #dc3545; opacity: 0.7; }
+    .history-header { display: flex; justify-content: space-between; font-weight: bold; }
+    .history-actions { display: flex; gap: 10px; margin-top: 5px; }
+    .btn-small { padding: 6px 10px; font-size: 14px; width: auto; flex: 1; }
+    .btn-danger { background-color: #dc3545; }
+    .btn-danger:hover { background-color: #c82333; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h2>Tạo link mobileconfig</h2>
+  <input id="name" placeholder="Nhập tên user (VD: 0936080757)" />
+  <button onclick="createLink()">Tạo link</button>
+  <div id="result" style="display: none;"></div>
+</div>
+
+<div class="history-container">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+    <h2 style="margin: 0; font-size: 18px;">Lịch sử tạo link</h2>
+    <button onclick="clearHistory()" class="btn-small btn-danger" style="width: auto;">Xoá lịch sử</button>
+  </div>
+  <div id="historyList">
+    </div>
+</div>
+
+<script>
+let countdownTimer;
+
+// Chạy hàm hiển thị lịch sử ngay khi tải trang
+document.addEventListener("DOMContentLoaded", renderHistory);
+
+async function createLink() {
+  const name = document.getElementById("name").value;
+  if (!name) { alert("Vui lòng nhập tên user!"); return; }
+
+  const res = await fetch("/api/create", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({ name })
+  });
+
+  const data = await res.json();
+  const fullLink = location.origin + "/download.html?data=" + data.data;
+
+  const decodedData = JSON.parse(atob(data.data));
+  const expTime = decodedData.exp;
+
+  const resultDiv = document.getElementById("result");
+  resultDiv.style.display = "block";
+  resultDiv.innerHTML = `
+    <p style="margin: 0 0 10px 0; font-size: 14px; color: #555;">Link tải cho <b>${name}</b>:</p>
+    <input value="${fullLink}" id="linkInput" readonly />
+    <button onclick="copyLink()" style="background-color: #28a745; margin-bottom: 10px;">Copy Link</button>
+    <div id="timeRemaining" class="countdown">Đang tính thời gian...</div>
+  `;
+
+  startCountdown(expTime);
+  
+  // Lưu vào LocalStorage
+  saveToHistory(name, fullLink, expTime);
+  document.getElementById("name").value = ""; // Xoá ô nhập sau khi tạo
+}
+
+function saveToHistory(name, link, expTime) {
+  let history = JSON.parse(localStorage.getItem("linkHistory") || "[]");
+  // Thêm link mới lên đầu danh sách
+  history.unshift({ name, link, expTime });
+  localStorage.setItem("linkHistory", JSON.stringify(history));
+  renderHistory(); // Cập nhật lại giao diện
+}
+
+function renderHistory() {
+  const history = JSON.parse(localStorage.getItem("linkHistory") || "[]");
+  const listDiv = document.getElementById("historyList");
+  
+  if (history.length === 0) {
+    listDiv.innerHTML = "<p style='text-align:center; color:#777;'>Chưa có link nào được tạo.</p>";
+    return;
+  }
+
+  listDiv.innerHTML = "";
+  history.forEach((item, index) => {
+    const isExpired = Date.now() > item.expTime;
+    const statusText = isExpired ? "<span style='color:#dc3545'>Đã hết hạn</span>" : "<span style='color:#28a745'>Hoạt động</span>";
+    
+    listDiv.innerHTML += `
+      <div class="history-item ${isExpired ? 'expired' : ''}">
+        <div class="history-header">
+          <span>🧑‍💻 ${item.name}</span>
+          <span style="font-size: 13px;">${statusText}</span>
+        </div>
+        <div class="history-actions">
+          <button class="btn-small" style="background-color: #28a745;" onclick="copyText('${item.link}')">Copy Link</button>
+          <button class="btn-small btn-danger" onclick="deleteHistoryItem(${index})">Xoá</button>
+        </div>
+      </div>
+    `;
+  });
+}
+
+function deleteHistoryItem(index) {
+  let history = JSON.parse(localStorage.getItem("linkHistory") || "[]");
+  history.splice(index, 1);
+  localStorage.setItem("linkHistory", JSON.stringify(history));
+  renderHistory();
+}
+
+function clearHistory() {
+  if (confirm("Bạn có chắc chắn muốn xoá toàn bộ lịch sử?")) {
+    localStorage.removeItem("linkHistory");
+    renderHistory();
+  }
+}
+
+function copyText(text) {
+  const tempInput = document.createElement("input");
+  tempInput.value = text;
+  document.body.appendChild(tempInput);
+  tempInput.select();
+  document.execCommand("copy");
+  document.body.removeChild(tempInput);
+  alert("Đã copy link thành công!");
+}
+
+function copyLink() {
+  const input = document.getElementById("linkInput");
+  input.select();
+  document.execCommand("copy");
+  alert("Đã copy link thành công!");
+}
+
+function startCountdown(expTime) {
+  if (countdownTimer) clearInterval(countdownTimer);
+  const display = document.getElementById("timeRemaining");
+
+  countdownTimer = setInterval(() => {
+    const now = Date.now();
+    const distance = expTime - now;
+
+    if (distance <= 0) {
+      clearInterval(countdownTimer);
+      display.innerHTML = "Link đã hết hạn!";
+      display.style.color = "gray";
+      renderHistory(); // Cập nhật lại trạng thái dưới danh sách
+      return;
+    }
+
+    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+    const formatSeconds = seconds < 10 ? "0" + seconds : seconds;
+
+    display.innerHTML = `Link tự huỷ sau: ${minutes}:${formatSeconds}`;
+  }, 1000);
+}
+</script>
+
+</body>
+</html>
