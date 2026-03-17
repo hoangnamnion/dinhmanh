@@ -3,14 +3,14 @@ export default function handler(req, res) {
 
   const payload = {
     name,
-    exp: Date.now() + 15 * 60 * 1000
+    exp: Date.now() + 15 * 60 * 1000,
+    ip: null,
+    ua: null
   };
 
   const encoded = Buffer.from(
     JSON.stringify(payload)
   ).toString("base64");
 
-  res.json({
-    data: encoded
-  });
+  res.json({ data: encoded });
 }
